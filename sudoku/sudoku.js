@@ -83,16 +83,20 @@ function createArrayTable(size) {
     shuffleArray(arr_table["1"])
     for (let index_cont = 2; index_cont <= size; index_cont++) {
         let container = arr_table[index_cont];
-        console.log(container);
-        for (let index_arr = 0; index_arr <= size; index_arr++) {
-            let possible_arr_num =[...arr_num]
-            possible_arr_num.filter(x => !container.includes(x))
-            let push_arr=rawControl(arr_table, index_arr);
-            possible_arr_num.filter(x => !push_arr.includes(x))
-            push_arr=collumnControl(arr_table, index_arr,index_cont);
-            possible_arr_num.filter(x => !push_arr.includes(x))
-            let final_num=(Math.random()*possible_arr_num.length)
+        for (let index_arr = 0; index_arr < size; index_arr++) {
+            let possible_arr_num = [...arr_num]
+            possible_arr_num = possible_arr_num.filter(x => !container.includes(x))
+            //container control
+            /*
+            let push_arr = rawControl(arr_table, index_arr);
+            possible_arr_num = possible_arr_num.filter(x => !push_arr.includes(x))
+            push_arr = collumnControl(arr_table, index_arr, index_cont);
+            possible_arr_num = possible_arr_num.filter(x => !push_arr.includes(x))
+             */
+            let final_num = possible_arr_num[Math.floor((Math.random() * possible_arr_num.length))]
             container.push(final_num);
+            console.log("possible:"+possible_arr_num);
+            
 
         }
     }
