@@ -2,7 +2,24 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+
 }
+:root{
+    --primary-bg-color: #0360bd;
+    --set-up-bg-color: #053fac;
+}
+/*
+External
+ */
+@font-face {
+    font-family:sudokuFont ;
+    src: url(../sudoku/ext-stuff/Navex-Regular.ttf);
+}
+
+
+/*
+External
+ */
 
 /*
 Header
@@ -10,15 +27,50 @@ Header
 header{
     display: flex;
     justify-content: space-between;
+    padding: 10px 40px;
+
+    background-color: var(--primary-bg-color);
+    h1{
+        font-family: sudokuFont ;
+        font-size: 50px;
+        color: white;
+    }
+}
+#ranking-container{
+    display: flex;
+    align-items: center;
+    svg{
+        width: 30px;
+        color: #f1c822;
+    }
+    a{
+        text-decoration: none;
+        font-family: poppins;
+        font-size: 20px;
+        color: white;
+        padding: 10px;
+    }
+}
+#under-header{
+    display: flex;
+    justify-content: center;
+
 }
 #setUp-container{
+    margin-top: -80px;
     display: flex;
     flex-direction: column;
+    padding: 30px 30px 30px 30px;
+    background-color: var(--primary-bg-color) ;
+    border: 10px solid var(--set-up-bg-color);
 
     button{
         width: 100px;
         height: 40px;
         font-size: 20px;
+    }
+    button[id=start-button]{
+        align-self: center;
     }
 }
 
