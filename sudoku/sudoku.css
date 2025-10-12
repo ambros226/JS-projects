@@ -5,8 +5,9 @@
 
 }
 :root{
-    --primary-bg-color: #0360bd;
-    --set-up-bg-color: #053fac;
+    --bg-game-color: rgba(5, 76, 209, 0.6);
+    --primary-bg-header-color: #0360bd;
+    --set-up-bg-color: #eae9e9;
 }
 /*
 External
@@ -29,7 +30,7 @@ header{
     justify-content: space-between;
     padding: 10px 40px;
 
-    background-color: var(--primary-bg-color);
+    background-color: var(--primary-bg-header-color);
     h1{
         font-family: sudokuFont ;
         font-size: 50px;
@@ -61,8 +62,9 @@ header{
     display: flex;
     flex-direction: column;
     padding: 30px 30px 30px 30px;
-    background-color: var(--primary-bg-color) ;
+    background-color: var(--primary-bg-header-color) ;
     border: 10px solid var(--set-up-bg-color);
+    border-radius: 10px;
 
     button{
         width: 100px;
@@ -87,9 +89,20 @@ Game/main section
 section{
     display: flex;
     justify-content: center;
+    height: 100vh;
+
 }
 
 #game-container{
+    margin-top: 3rem;
+    width: 45rem;
+    height: 45rem;
+    border: 5px solid #454545;
+    border-radius: 10px;
+    padding: 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
 }
 

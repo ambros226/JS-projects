@@ -1,10 +1,12 @@
 const start = document.getElementById('start-button');
 const dif = document.querySelectorAll('.dif-button');
+const game_container = document.getElementById('game-container');
 let size = null
 let container_size
 start.addEventListener('click', () => {
     if (size !== null) {
-        createArrayTable(size);
+       let table= createArrayTable(size);
+       table_output(table);
     }
 })
 dif.forEach(button => {
@@ -56,13 +58,12 @@ function collumnControl(arr_table, index, index_cont) {
         arr_index.push(i);
         i = i + (container_size - 1);
     }
-    for (let indexOne = index_cont; indexOne < size; indexOne++) {
+    for (let indexOne = index_cont% container_size; indexOne < size; indexOne++) {
         try {
             arr_index.forEach((indexTwo) => {
                 pop_arr.push(arr_table[indexOne][indexTwo]);
             })
         } catch (err) {
-            console.log(err);
         }
         indexOne = indexOne + (container_size - 1);
     }
@@ -86,7 +87,6 @@ function createArrayTable(size) {
     for (let index_cont = 2; index_cont <= size; index_cont++) {
         let container = arr_table[index_cont];
         let row_test = 0
-        console.log(index_cont + "index:" + container)
         for (let index_arr = 0; index_arr < size; index_arr++) {
             if (row_test >= 3) {
                 continue
@@ -106,11 +106,16 @@ function createArrayTable(size) {
                 arr_table[index_cont] = [];
                 index_arr = -1;
                 row_test++
-                console.log("problem")
                 if (row_test >= 3) {
                     if (index_cont > 2) {
                         arr_table[index_cont - 1] = []
                         index_cont = index_cont - 2
+                        console.log("back on the line:", index_cont + 1)
+                        break
+                    }
+                    else if(index_cont === 2) {
+                        arr_table[index_cont] = []
+                        index_cont = index_cont - 1
                         console.log("back on the line:", index_cont + 1)
                         break
                     }
@@ -125,8 +130,62 @@ function createArrayTable(size) {
 
         }
     }
-    console.log(arr_table);
+    return arr_table;
 
 }
+function table_output(arr_table) {
+    console.log(arr_table)
+    let size_px
+    switch (Number(size)){
+        case 4:
+            size_px=80;
+            break;
+        case 9:
+            size_px=60;
+            break;
+        case 16:
+            size_px=40;
+            break;    
+    }
+    const box = document.createElement("div");
+    box.classList.add("sudoku");
+    box.style.width = "fit-content";
+    box.style.display = "grid";
+    box.style.gap = "3px";
+    box.style.gridTemplateColumns = `repeat(${container_size}, auto)`;
+
+    for (let i = 1; i <= size; i++) {
+        const container_arr = arr_table[i];
+        const container = document.createElement("div");
+        container.classList.add("sudoku_container");
+        container.style.display = "grid";
+        container.style.border = "2px solid black";
+        container.style.gap = "1px";
+        
+        container.style.gridTemplateColumns = `repeat(${container_size}, ${size_px}px)`;
+
+        container_arr.forEach(num_arr => {
+            
+            const num = document.createElement("span");
+            num.classList.add("sudoku_num");
+            num.innerHTML = num_arr.toString();
+            
+            num.style.display = "flex";
+            num.style.alignItems = "center";
+            num.style.justifyContent = "center";
+            num.style.width = `${size_px}px`;
+            num.style.height = `${size_px}px`;
+            num.style.border = "1px solid #666";
+            num.style.fontSize = "20px";
+
+            container.appendChild(num);
+        });
+
+        box.appendChild(container);
+    }
+    
+    game_container.appendChild(box);
+}
+
 
 
