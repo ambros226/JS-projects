@@ -9,6 +9,7 @@ let timerInterval;
 let totalSeconds = 0;
 let correctStreak
 let mistakeStreak
+let task_table
 
 start.addEventListener('click', () => {
     if (size !== null) {
@@ -16,7 +17,7 @@ start.addEventListener('click', () => {
         mistakeStreak = 0
         let answer_table = createArrayTable(size);
         let task_table_arr = createTaskTable(answer_table);
-        let task_table = task_table_arr[0]
+        task_table = task_table_arr[0]
         let empty_fields = task_table_arr[1]
         table_output(task_table, empty_fields);
     }
@@ -186,31 +187,7 @@ function table_output(arr_table, empty_fields) {
 
     end_btn.addEventListener("click", () => {
         clearInterval(timerInterval);
-        setUp_cont.innerHTML = `
-        <div id="setUp-difficulty">
-        <button class="dif-button" value="4">Easy</button>
-        <button class="dif-button" value="9">Medium</button>
-        <button class="dif-button" value="16">Hard</button>
-    </div>
-    <button id="start-button">Start</button>`;
-        document.getElementById('start-button').addEventListener('click', () => {
-            if (size !== null) {
-                let answer_table = createArrayTable(size);
-                let task_table_arr = createTaskTable(answer_table);
-                let task_table = task_table_arr[0]
-                let empty_fields = task_table_arr[1]
-                table_output(task_table, empty_fields);
-            }
-        });
-
-        document.querySelectorAll('.dif-button').forEach(button => {
-            button.addEventListener('click', () => {
-                size = Number(button.value);
-                container_size = Math.sqrt(size);
-                console.log(`Size:${size}x${size} Container size:${container_size}`);
-            });
-        });
-        game_container.innerHTML = "";
+        location.reload(true);
     });
 
     btnContainer.appendChild(end_btn);
@@ -275,7 +252,7 @@ function table_output(arr_table, empty_fields) {
                 num.style.fontSize = "20px";
                 num.addEventListener("change", (e) => {
                     if (e.target.value) {
-                        controlTable(empty_fields, arr_table, e.target);
+                        controlTable(empty_fields, e.target);
                     }
                 });
                 num.addEventListener("input", inputCheck)
@@ -342,89 +319,51 @@ function inputCheck(e) {
     }
 }
 
-function controlTable(empty_fields, task_table, input) {
+function controlTable(empty_fields, input) {
     if (!Array.isArray(empty_fields)) {
         console.error("Error controlTable: empty_fields není pole! Hodnota:", empty_fields);
         return;
     }
-
-    console.log("Bef:Empty fields:", empty_fields);
     let contIndex = Number(input.dataset.containerIndex);
     let numIndex = Number(input.dataset.numIndex);
-    console.log("contIndex:", contIndex, "\nNum index:", numIndex);
-
     let copyTaskTable = JSON.parse(JSON.stringify(task_table));
-    let copyEmptyFields = [...empty_fields];
+    let possible_num = [Number(input.value)];
 
-    let indexEmptyFields = copyEmptyFields.findIndex(([c, n]) => c === contIndex && n === numIndex);
-    if (indexEmptyFields !== -1) {
-        copyEmptyFields.splice(indexEmptyFields, 1);
+    let container = copyTaskTable[contIndex].filter(x => x !== 'N');
+    console.log("Container:", container);
+    possible_num = possible_num.filter(x => !container.includes(x));
+
+    let row = rawControlFin(copyTaskTable, numIndex, contIndex).filter(x => x !== 'N');
+    console.log("Row:", row);
+    possible_num = possible_num.filter(x => !row.includes(x))
+
+    let column = collumnControlFin(copyTaskTable, numIndex, contIndex).filter(x => x !== 'N');
+    console.log("Column:", column);
+    possible_num = possible_num.filter(x => !column.includes(x))
+    if (possible_num.length <= 0) {
+        mistakeOutPut(input);
+        return;
+    } else {
+        copyTaskTable[contIndex][numIndex] = input.value;
     }
-    copyEmptyFields.unshift([contIndex, numIndex]);
-    console.log("Aft:Empty fields:", copyEmptyFields);
-
-    let correct = true;
-    let nums_array = [];
-
-    for (let i = 0; i < copyEmptyFields.length; i++) {
-        nums_array.push(Array.from({length: size}, (_, n) => n + 1));
+    if (size === 4) {
+        empty_fields.shift()
+        task_table[contIndex][numIndex] = Number(input.value)
+        correctOutPut(input, empty_fields);
+        return;
     }
+    let boardCorrect = transformArray(copyTaskTable)
 
-    nums_array[0] = [Number(input.value)];
-
-    for (let i = 0; i < copyEmptyFields.length; i++) {
-        let nums = nums_array[i];
-        let [ForContIndex, ForNumIndex] = copyEmptyFields[i];
-        console.log("Cont-index:", ForContIndex, "Cont-index:", ForNumIndex)
-        console.log("Possible nums:", nums);
-
-        let container = copyTaskTable[ForContIndex].filter(x => x !== 'N');
-        console.log("Container:", container);
-        nums = nums.filter(x => !container.includes(x));
-
-        let row = rawControlFin(copyTaskTable, ForNumIndex, ForContIndex).filter(x => x !== 'N');
-        console.log("Row:", row);
-        nums = nums.filter(x => !row.includes(x))
-
-        let column = collumnControlFin(copyTaskTable, ForNumIndex, ForContIndex).filter(x => x !== 'N');
-        console.log("Column:", column);
-        nums = nums.filter(x => !column.includes(x))
-        console.log("possible nums:", nums);
-        if (nums.length === 0) {
-            if (i === 0) {
-                mistakeOutPut(input);
-                correct = false;
-                break;
-            }
-
-            nums_array[i - 1].shift();
-            console.log(nums_array)
-            console.log("i:",i);
-            console.log("nums array [i-1]:",[i - 1]);
-            console.log("copyEmptyFields[i - 1]):",copyEmptyFields[i - 1]);
-            
-            let [DeleteContIndex, DeleteNumIndex] = copyEmptyFields[i - 1];
-            console.log("copyTaskTable[ForContIndex][ForNumIndex]:",copyTaskTable[ForContIndex][ForNumIndex])
-            copyTaskTable[DeleteContIndex][DeleteNumIndex] = 'N';
-            i -= 2;
-            console.log("back")
-            continue;
-        }
-
-        copyTaskTable[ForContIndex][ForNumIndex] = nums[0];
-        console.log("copyTaskTable:",copyTaskTable);
-    }
-    
-    if (correct) {
-        correctOutPut(input);
-        task_table[contIndex][numIndex] = Number(input.value);
-        const idx = empty_fields.findIndex(([c, n]) => c === contIndex && n === numIndex);
-        if (idx !== -1) empty_fields.splice(idx, 1);
-        if (empty_fields.length === 0) {
-            win();
-            console.log("You win");
-        }
-
+    if (solveSudoku(boardCorrect)) {
+        console.log("vyřešeno");
+        empty_fields.shift()
+        task_table[contIndex][numIndex] = Number(input.value)
+        correctOutPut(input, empty_fields);
+        return;
+    } else {
+        console.log(`${name} nelze vyřešit.`);
+        mistakeOutPut(input);
+        return;
     }
 
 }
@@ -462,7 +401,74 @@ function collumnControlFin(arr_table, index, index_cont) {
     return pop_arr;
 }
 
-function correctOutPut(input) {
+function isSafe(board, row, col, num, N, blockSize) {
+    for (let x = 0; x < N; x++) {
+        if (board[row][x] === num || board[x][col] === num) return false;
+    }
+
+    let startRow = row - (row % blockSize);
+    let startCol = col - (col % blockSize);
+    for (let i = 0; i < blockSize; i++) {
+        for (let j = 0; j < blockSize; j++) {
+            if (board[startRow + i][startCol + j] === num) return false;
+        }
+    }
+
+    return true;
+}
+
+function solveSudoku(board) {
+    const N = board.length;
+    // pokud √N není celé číslo, nepodporujeme
+    const sqrt = Math.sqrt(N);
+    if (sqrt % 1 !== 0) {
+        console.log("Nepodporovaná velikost Sudoku:", N);
+        return false;
+    }
+    const blockSize = sqrt;
+
+    for (let row = 0; row < N; row++) {
+        for (let col = 0; col < N; col++) {
+            if (board[row][col] === 0) {
+                for (let num = 1; num <= N; num++) {
+                    if (isSafe(board, row, col, num, N, blockSize)) {
+                        board[row][col] = num;
+                        if (solveSudoku(board)) return true;
+                        board[row][col] = 0; // zpět (backtrack)
+                    }
+                }
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+function transformArray(array, size) {
+    array = Object.values(array)
+    array = array.map(num_raw =>
+        num_raw.map(num => num === "N" ? 0 : num)
+    );
+    let finalArray = [];
+    for (let row = 0; row < size; row++) {
+        finalArray.push([]);
+    }
+    let copyArray = [...array];
+
+    for (let i = 0; i < size; i++) {
+        for (let j = Math.floor(i / Math.sqrt(size)) * Math.sqrt(size); j <= (Math.floor(i / Math.sqrt(size)) * Math.sqrt(size)) + (Math.sqrt(size) - 1); j++) {
+            for (let k = 0; k < Math.sqrt(size); k++) {
+                let num = copyArray[i].shift()
+                finalArray[j].push(num);
+            }
+        }
+    }
+    console.log(finalArray);
+
+    return finalArray;
+}
+
+function correctOutPut(input, emptyFields) {
     mistakeStreak = 0
     correctStreak++
     score += (100 + (50 * correctStreak) <= 1000) ? 100 + (50 * correctStreak) : 1000;
@@ -470,6 +476,10 @@ function correctOutPut(input) {
     console.log("correct");
     console.log("Score:", score);
     mistake_container.innerHTML = `<p data-answ='correct'>+${(100 + (50 * correctStreak) <= 1000) ? (100 + (50 * correctStreak)) : 1000} pts correct ${correctStreak >= 2 ? `,streak:${correctStreak}` : ""}</p>`;
+    if (emptyFields.length <= 0) {
+        win()
+        return;
+    }
 }
 
 function mistakeOutPut(input) {
@@ -486,19 +496,23 @@ function win() {
     clearInterval(timerInterval);
     console.log(totalSeconds)
     let maxSec
+    let difficulty
     switch (size) {
         case 4:
             maxSec = 300;
+            difficulty = "easy";
             break;
         case 9:
             maxSec = 900;
+            difficulty = "medium";
             break;
         case 16:
             maxSec = 1500;
+            difficulty = "hard";
             break;
     }
-    let timeScore=10000-((Math.floor(10000/maxSec))*totalSeconds)<0?0:10000-((Math.floor(10000/maxSec))*totalSeconds);
-    let finalScore=score+timeScore<0?0:score+timeScore;
+    let timeScore = 10000 - ((Math.floor(10000 / maxSec)) * totalSeconds) < 0 ? 0 : 10000 - ((Math.floor(10000 / maxSec)) * totalSeconds);
+    let finalScore = score + timeScore < 0 ? 0 : score + timeScore;
     const setUp_cont = document.getElementById("setUp-container");
     setUp_cont.innerHTML = `
         <div id="setUp-difficulty">
@@ -525,22 +539,44 @@ function win() {
         });
     });
     game_container.innerHTML = "";
-    game_container.innerHTML += `
-<div id="win-container">
-      <h2>WIN</h2>
-      <p id="size">${size}x${size}</p>
-      <p id="score-sentence">Score:<span id="score">${finalScore}</span></p>
-      <p id="win-sentence">Push your score on to rankings</p>
-      <div id="win-form">
-        <label for="name">Name</label>
-        <input type="text" id="name" maxlength="20" name="name">
-        <button id="ranking-btn" class="btn-liquid liquid"><span>Push</span></button>
-    </div>
-      
-</div>
-    `
-    const scoreEffect=document.getElementById('score')
+    game_container.innerHTML +=
+        `<div id="win-container">
+            <h2>WIN</h2>
+            <p id="size">${size}x${size}</p>
+            <p id="score-sentence">Score:<span id="score">${finalScore}</span></p>
+            <p id="win-sentence">Push your score on to rankings</p>
+           <div id="win-form">
+            <label for="name">Name</label>
+            <input type="text" id="name" maxlength="20" name="name">
+            <button  id="ranking-btn" class="btn-liquid liquid"><span>Push</span></button>
+           </div>
+        </div>`
+    const rankBtn = document.getElementById("ranking-btn");
+    rankBtn.addEventListener("click", function () {
+        const data = {
+            name: document.getElementById("name").value,
+            score: Number(finalScore),
+            difficulty: difficulty
+        };
+
+        // posíláme přes fetch
+        fetch("insert-db.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        })
+            .then(res => res.text())
+            .then(data => {
+                console.log(data)
+            })
+            .catch(err => console.error(err));
+            location.reload(true);
+    });
+    const scoreEffect = document.getElementById('score')
     animateValue(scoreEffect, 0, finalScore, 3000);
+    
 }
 
 function animateValue(obj, start, end, duration) {
@@ -548,7 +584,7 @@ function animateValue(obj, start, end, duration) {
     const step = (timestamp) => {
         if (!startTimestamp) startTimestamp = timestamp;
         const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-        obj.innerHTML = Math.floor((progress * (end - start) + start)/10)*10;
+        obj.innerHTML = Math.floor((progress * (end - start) + start) / 10) * 10;
         if (progress < 1) {
             window.requestAnimationFrame(step);
         }
