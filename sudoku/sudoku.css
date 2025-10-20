@@ -47,7 +47,7 @@ header{
     a{
         text-decoration: none;
         font-family: poppins;
-        font-size: 20px;
+        font-size: 30px;
         color: white;
         padding: 10px;
     }
@@ -67,11 +67,15 @@ header{
     border-radius: 10px;
     width: 360px;
     height: 160px;
+    gap: 10px;
 
     button{
         width: 100px;
         height: 40px;
         font-size: 20px;
+        background: #ffffff;
+        border: 2px solid var(--set-up-bg-color);
+        border-radius: 10px;
     }
     button[id=start-button]{
         align-self: center;
@@ -80,6 +84,12 @@ header{
 
 #setUp-difficulty{
     display: flex;
+    gap: 10px;
+}
+button.active{
+    color: #04b604;
+    background: #e9eae9 !important;
+
 }
 /*
 Header
@@ -294,7 +304,28 @@ main{
 database section
  */
 
+/*
+modulo
+ */
+#modal{
+    width:490px;
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    background: #fbfbfb;
+    border: 3px solid #e3e3e3;
+    border-radius: 15px;
+    position: absolute;
+    top: 8%;
+    right: 0;
+    p{
+        padding: 10px 0;
+    }
 
+}
+/*
+modulo
+ */
 
 
 

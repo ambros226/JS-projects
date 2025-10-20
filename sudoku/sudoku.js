@@ -1,5 +1,6 @@
 const start = document.getElementById('start-button');
 const dif = document.querySelectorAll('.dif-button');
+const difBtnContainer = document.querySelectorAll('#setUp-difficulty button');
 const game_container = document.getElementById('game-container');
 const mistake_container = document.getElementById('mistake-container');
 let size = null
@@ -10,6 +11,14 @@ let totalSeconds = 0;
 let correctStreak
 let mistakeStreak
 let task_table
+
+
+difBtnContainer.forEach(btn => {
+    btn.addEventListener('click', () => {
+        difBtnContainer.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    });
+});
 
 start.addEventListener('click', () => {
     if (size !== null) {
@@ -547,7 +556,7 @@ function win() {
             <p id="win-sentence">Push your score on to rankings</p>
            <div id="win-form">
             <label for="name">Name</label>
-            <input type="text" id="name" maxlength="20" name="name">
+            <input type="text" id="name" maxlength="12" name="name">
             <button  id="ranking-btn" class="btn-liquid liquid"><span>Push</span></button>
            </div>
         </div>`
